@@ -1,0 +1,192 @@
+Concurrent programming with Go
+HS-WAW 2015, October 10, 2015
+
+Justyna Ilczuk
+@attilczuk
+
+
+* Anatomy of a Go program
+
+.play workshops/hello.go
+
+
+* Closures
+
+.play workshops/closure.go
+
+
+* Just add go!
+
+.play workshops/add.go
+
+* Oh, we have to wait!
+
+.play workshops/sillywait.go
+
+
+* Smarter ways of waiting
+
+- use sync.WaitGroup
+- use channels
+
+* WaitGroup - specialized for waiting
+
+.play workshops/waitgroup.go
+
+* Exercise 1 - multiple goroutines
+
+Change closures to goroutines and wait for them:
+
+.play workshops/exercise_add.go
+
+* Exercise 1 - solution
+
+.play workshops/multiple.go
+
+* Channels
+
+- type safe queue
+- synchronization mechanism
+
+.link http://www.goinggo.net/2014/02/the-nature-of-channels-in-go.html
+
+* Unbuffered channel
+
+.image workshops/unbufferedchannel.png
+
+.link http://www.goinggo.net/2014/02/the-nature-of-channels-in-go.html source
+
+* Buffered channel
+
+.image workshops/buffered.png
+
+.link http://www.goinggo.net/2014/02/the-nature-of-channels-in-go.html source
+
+* Creating and using channels
+
+    unbufferedch := make(chan int)
+    bufferedch := make(chan int, 20)
+    
+    // Write to channel.
+    ch <- 42
+    
+    // Receive to channel.
+    answer := <-ch
+
+    // Receive and discard value
+    <-ch
+
+* Intro to channels - example
+
+.play workshops/firstchannel.go
+
+* Exercise 2 - use channel for waiting
+
+Replace time.Sleep with channel communication
+
+.play workshops/sillywait.go
+
+* Exercise 2 - solution
+
+.play workshops/channelwait.go
+
+* Exercise 3 - vending machine
+
+Design a vending machine that will take coins as input and chocolate as output.
+
+Let's imagine that Gophers have coins of value 1, 2 and 5.
+Gopher can choose the item and then has to insert money and wait for
+the vending machine to dispense the item.
+
+* Exercise 4 - design simple work pipeline
+
+Hackers started working on the new IRC bot. They decided that the bot
+should support command:
+`~shoutitinreverse`
+
+Your task is to design a following string processing pipeline:
+put on queue -> strip whitespace -> change to UPPER -> reverse -> print
+
+What additional features could it support?
+
+* Select statement
+
+Combine multiple channels:
+
+.play workshops/cake.go /START OMIT/,/END OMIT/
+
+* Select statement continued
+
+Non blocking channel operations, e.g. notifications
+
+Select with default
+
+.play workshops/quitbacking.go /START OMIT/,/END OMIT/
+
+* Exercise 5 - control access to 3D printers
+
+During busy hackaton 3D printers are heavily used. Write a simulation of hackers trying to access 3D printers.
+
+In the hackerspace, there are 3 3D printers. There are 7 hackers that are interested in using the printers.
+
+If the hacker can't access the printer for more than 5 seconds,
+ he gets annoyed and quits the hackaton.
+ Hackers use printers for random interval from 1 to 10 seconds and
+ usually they need to use the printer at least twice,
+ because nothing is perfect for the first time.
+
+* Access to shared variables
+
+- sync.Mutex
+- sync.RWMutex
+
+        var k int
+        var mu sync.Mutex
+
+		mu.Lock()
+		defer mu.Unlock()
+		health = k.health - 10
+
+* Detecting data races
+
+A data race occurs when: two or more threads in a single process access the same memory location concurrently, and. at least one of the accesses is for writing, and. the threads are not using any exclusive locks to control their accesses to that memory.
+
+    go run -race app.go
+
+* Alternative idea - share data by communication
+
+.link https://blog.golang.org/share-memory-by-communicating
+.link https://golang.org/doc/codewalk/sharemem/
+
+Example 1: instead of changing the variable from multiple goroutines,
+communicate changes by putting events on a channel,
+and then consume channel in single goroutine and keep state
+ local to one goroutine only.
+
+Example 2: transport ownership of the resource by putting it on the channel.
+
+* Exercise 6 - hackerspace membership fees
+
+Every month, hackerspace has to pay its bills and every hacker has to pay his or her membership fee.
+
+Requirements:
+- Hackers in general don't pay their fees the same day every month,
+ it's much more random.
+- Bills however have to be paid on time.
+- The board wants monthly reports of the funds.
+
+Use share memory by communication approach (avoid mutexes).
+
+* Watch out!
+
+- goroutine leaks
+- data races
+- deadlocks
+
+* Remember about
+
+- Data flow
+- Drawing
+- Pipelines
+- Exiting
+
