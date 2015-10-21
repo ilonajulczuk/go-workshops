@@ -190,4 +190,3 @@ Use share memory by communication approach (avoid mutexes).
 - Drawing
 - Pipelines
 - Exiting
-
