@@ -8,6 +8,7 @@ Justyna Ilczuk
 * Anatomy of a Go program
 
 .play workshops/hello.go
+.link https://github.com/ilonajulczuk/go-workshops
 
 
 * Closures
